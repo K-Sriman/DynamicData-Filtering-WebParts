@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "dynamic-data-filtering-web-parts-client-side-solution",
+    "id": "ef404023-5b1d-4574-a5cd-301e57f805e1",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.20.0"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "DynamicData-filtering_WebParts description"
+      },
+      "longDescription": {
+        "default": "DynamicData-filtering_WebParts description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "dynamic-data-filtering-web-parts Feature",
+        "description": "The feature that activates elements of the dynamic-data-filtering-web-parts solution.",
+        "id": "7f8d4a68-5226-4bea-8cea-7ecbbe6aad58",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/dynamic-data-filtering-web-parts.sppkg"
+  }
+}
