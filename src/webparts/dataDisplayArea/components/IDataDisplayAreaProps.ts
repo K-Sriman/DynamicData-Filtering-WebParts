@@ -1,5 +1,8 @@
-import { WebPartContext } from "@microsoft/sp-webpart-base";
+import { DynamicProperty } from "@microsoft/sp-component-base";
+
 
 export interface IDataDisplayAreaProps {
-  ctx: WebPartContext;
+    Name:DynamicProperty<string>,
+    Gender:DynamicProperty<string>,
+    Email:DynamicProperty<string>,
 }

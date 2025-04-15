@@ -13,6 +13,21 @@
 .welcome {
   text-align: center;
 }
+.filter{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+  margin: 10px 0px;
+  gap: 10px;
+}
+.genderDropDown{
+  width: 200px;
+}
+.searchBar{
+  width: 200px;
+  height: 30px;
+}
 
 .welcomeImage {
   width: 100%;

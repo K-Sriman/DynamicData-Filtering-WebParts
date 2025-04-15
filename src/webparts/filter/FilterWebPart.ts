@@ -1,121 +1,85 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Version } from '@microsoft/sp-core-library';
-import {
-  type IPropertyPaneConfiguration,
-  PropertyPaneTextField
-} from '@microsoft/sp-property-pane';
-import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-import { IReadonlyTheme } from '@microsoft/sp-component-base';
-
-import * as strings from 'FilterWebPartStrings';
+import { BaseClientSideWebPart, WebPartContext } from '@microsoft/sp-webpart-base';
 import Filter from './components/Filter';
 import { IFilterProps } from './components/IFilterProps';
 
+import {
+	IDynamicDataPropertyDefinition,
+	IDynamicDataCallables
+} from "@microsoft/sp-dynamic-data";
+ 
 export interface IFilterWebPartProps {
-  description: string;
+  ctx: WebPartContext;  
 }
 
-export default class FilterWebPart extends BaseClientSideWebPart<IFilterWebPartProps> {
 
-  private _isDarkTheme: boolean = false;
-  private _environmentMessage: string = '';
+export default class FilterWebPart extends BaseClientSideWebPart<IFilterWebPartProps> implements IDynamicDataCallables {
+  private _Name:string;
+  private _gender:string;
+  private _Email:string;
 
+  protected async onInit(): Promise<void> {
+    this.context.dynamicDataSourceManager.initializeSource(this);
+  }
   public render(): void {
     const element: React.ReactElement<IFilterProps> = React.createElement(
       Filter,
       {
-        description: this.properties.description,
-        isDarkTheme: this._isDarkTheme,
-        environmentMessage: this._environmentMessage,
-        hasTeamsContext: !!this.context.sdks.microsoftTeams,
-        userDisplayName: this.context.pageContext.user.displayName
+        ctx: this.context,
+        onNameChange:this._handleNameChange,
+        onGenderChanger:this._handleGenderChange,
+        onEmailChange:this._onEmailChange
       }
     );
-
     ReactDom.render(element, this.domElement);
   }
-
-  protected onInit(): Promise<void> {
-    return this._getEnvironmentMessage().then(message => {
-      this._environmentMessage = message;
-    });
+  private _handleNameChange=(name:string):void=>{
+    this._Name=name || ""; 
+    this.context.dynamicDataSourceManager.notifyPropertyChanged("name");
   }
-
-
-
-  private _getEnvironmentMessage(): Promise<string> {
-    if (!!this.context.sdks.microsoftTeams) { // running in Teams, office.com or Outlook
-      return this.context.sdks.microsoftTeams.teamsJs.app.getContext()
-        .then(context => {
-          let environmentMessage: string = '';
-          switch (context.app.host.name) {
-            case 'Office': // running in Office
-              environmentMessage = this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentOffice : strings.AppOfficeEnvironment;
-              break;
-            case 'Outlook': // running in Outlook
-              environmentMessage = this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentOutlook : strings.AppOutlookEnvironment;
-              break;
-            case 'Teams': // running in Teams
-            case 'TeamsModern':
-              environmentMessage = this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentTeams : strings.AppTeamsTabEnvironment;
-              break;
-            default:
-              environmentMessage = strings.UnknownEnvironment;
-          }
-
-          return environmentMessage;
-        });
-    }
-
-    return Promise.resolve(this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentSharePoint : strings.AppSharePointEnvironment);
+  private _onEmailChange=(email:string):void=>{
+    this._Name=email || ""; 
+    this.context.dynamicDataSourceManager.notifyPropertyChanged("gender");
   }
-
-  protected onThemeChanged(currentTheme: IReadonlyTheme | undefined): void {
-    if (!currentTheme) {
-      return;
-    }
-
-    this._isDarkTheme = !!currentTheme.isInverted;
-    const {
-      semanticColors
-    } = currentTheme;
-
-    if (semanticColors) {
-      this.domElement.style.setProperty('--bodyText', semanticColors.bodyText || null);
-      this.domElement.style.setProperty('--link', semanticColors.link || null);
-      this.domElement.style.setProperty('--linkHovered', semanticColors.linkHovered || null);
-    }
-
+  private _handleGenderChange=(gender:string):void=>{
+    this._gender=gender || ""; 
+      this.context.dynamicDataSourceManager.notifyPropertyChanged("email");
   }
-
+  
   protected onDispose(): void {
     ReactDom.unmountComponentAtNode(this.domElement);
   }
 
-  protected get dataVersion(): Version {
-    return Version.parse('1.0');
+  getPropertyDefinitions(): ReadonlyArray<IDynamicDataPropertyDefinition> {
+    return[
+      {
+        id:"name",
+        title:"Name"
+      },
+      {
+        id:"gender",
+        title:"Gender"
+      },
+      {
+        id:"email",
+        title:"Email"
+      }
+    ]
   }
 
-  protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
-    return {
-      pages: [
-        {
-          header: {
-            description: strings.PropertyPaneDescription
-          },
-          groups: [
-            {
-              groupName: strings.BasicGroupName,
-              groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
-                })
-              ]
-            }
-          ]
-        }
-      ]
-    };
+ public getPropertyValue(propertyId: string) {
+    switch(propertyId){
+      case "name":
+        return this._Name;
+      case "gender":
+        return this._gender;
+      case "email":
+        return this._Email;
+      } 
+      throw new Error("bad property");
+    
   }
+  
+  
 }

@@ -1,64 +1,67 @@
 import * as React from 'react';
-import * as ReactDom from 'react-dom';
-import { Version } from '@microsoft/sp-core-library';
+import * as ReactDom from 'react-dom'; 
 import {
+  DynamicDataSharedDepth,
   type IPropertyPaneConfiguration,
-  PropertyPaneTextField
-} from '@microsoft/sp-property-pane';
+  PropertyPaneDynamicField,
+  PropertyPaneDynamicFieldSet,
+} from '@microsoft/sp-property-pane'; 
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-// import { IReadonlyTheme } from '@microsoft/sp-component-base';
 
 import * as strings from 'DataDisplayAreaWebPartStrings';
 import DataDisplayArea from './components/DataDisplayArea';
 import { IDataDisplayAreaProps } from './components/IDataDisplayAreaProps';
-
+import { DynamicProperty } from '@microsoft/sp-component-base';
+ 
 export interface IDataDisplayAreaWebPartProps {
-  description: string;
+  Name:DynamicProperty<string>,
+  Gender:DynamicProperty<string>,
+  Email:DynamicProperty<string>,
 }
-
-export default class DataDisplayAreaWebPart extends BaseClientSideWebPart<IDataDisplayAreaWebPartProps> {
-
-
+export default class DataDisplayAreaWebPart extends BaseClientSideWebPart<IDataDisplayAreaProps>  {
 
   public render(): void {
-    const element: React.ReactElement<IDataDisplayAreaProps> = React.createElement(
+    const element: React.ReactElement<IDataDisplayAreaWebPartProps> = React.createElement(
       DataDisplayArea,
       {
-
-        ctx: this.context
+        Email:this.properties.Email,
+        Name: this.properties.Name,
+        Gender:this.properties.Gender
       }
     );
 
     ReactDom.render(element, this.domElement);
   }
 
- 
-
-
-
- 
-
   protected onDispose(): void {
     ReactDom.unmountComponentAtNode(this.domElement);
   }
-
-  protected get dataVersion(): Version {
-    return Version.parse('1.0');
-  }
-
+  
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
     return {
       pages: [
         {
-          header: {
-            description: strings.PropertyPaneDescription
-          },
+          header: { description: strings.PropertyPaneDescription },
           groups: [
             {
-              groupName: strings.BasicGroupName,
+              groupName: "Dynamic Filters",
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
+                PropertyPaneDynamicFieldSet({
+                  label: "Connect Filters",
+                  fields: [
+                    PropertyPaneDynamicField('Name', {
+                      label: "Name"
+                    }),
+                    PropertyPaneDynamicField('Gender', {
+                      label: "Gender"
+                    }),
+                    PropertyPaneDynamicField('Email', {
+                      label: "Email"
+                    })
+                  ],
+                  sharedConfiguration: {
+                    depth: DynamicDataSharedDepth.Source
+                  }
                 })
               ]
             }
@@ -67,4 +70,5 @@ export default class DataDisplayAreaWebPart extends BaseClientSideWebPart<IDataD
       ]
     };
   }
+   
 }
